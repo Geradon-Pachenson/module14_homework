@@ -1,0 +1,100 @@
+
+
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Exersise 5</title>
+    </head>
+    <body>
+        <label>Номер страницы <input type="text" class="input__page" style="color: #070000; width: 10%; font-size: 14px; background-color: rgb(255, 255, 255); " /></label>
+        <label>Лимит <input type="text" class="input__limit" style="color: #795c30; width: 10%; font-size: 14px; background-color: rgb(253, 253, 253);" /></label>
+        <button class="button" style="border-radius: 2px; background: #a38df3; cursor: pointer;">запрос</button>
+        <button class="btn__clear" style="border-radius: 2px; background: #ebe9f3; cursor: pointer;">Очищаем localStorage</button>
+        <div class="picture" style="padding: 50px; width: 90%; display: flex; gap: 30px;"></div>
+        <script>
+        // Написать код приложения, интерфейс которого состоит из двух input и кнопки. В input можно ввести любое число.
+
+        // Заголовок первого input — «номер страницы».
+        // Заголовок второго input — «лимит».
+        // Заголовок кнопки — «запрос».
+        // При клике на кнопку происходит следующее:
+
+        // Если число в первом input не попадает в диапазон от 1 до 10 или не является числом — выводить ниже текст «Номер страницы вне диапазона от 1 до 10»;
+        // Если число во втором input не попадает в диапазон от 1 до 10 или не является числом — выводить ниже текст «Лимит вне диапазона от 1 до 10»;
+        // Если и первый, и второй input не в диапазонах или не являются числами — выводить ниже текст «Номер страницы и лимит вне диапазона от 1 до 10»;
+        // Если числа попадают в диапазон от 1 до 10 — сделать запрос по URL https://jsonplaceholder.typicode.com/photos?_page=0&_limit=5, где GET-параметр _page — это число из первого input, а GET-параметр _limit — это введённое число второго input.
+        // Пример. Если пользователь ввёл 5 и 7, то запрос будет вида https://jsonplaceholder.typicode.com/photos?_page=5&_limit=7.
+        // После получения данных вывести список картинок на экран.
+
+        // Если пользователь перезагрузил страницу, то ему должны показываться картинки из последнего успешно выполненного запроса (использовать localStorage).
+            
+            const btn = document.querySelector(".button");
+            const btnClear = document.querySelector(".btn__clear");
+            // Переменная из div class="picture"
+            const resultNode = document.querySelector(".picture");
+
+            function displayResult(apiData) {
+                let cards = "";
+
+                apiData.forEach((item) => {
+                const cardBlock = `
+                    <div class="card">
+                        <img class="card-image" src="${item.thumbnailUrl}">
+                        <p style="max-width: 150px; overflow: hidden;">${item.title}</p>
+                    </div>
+                `;
+                cards += cardBlock;
+                });
+
+                resultNode.innerHTML = cards;
+            }
+            
+            //Проверяем есть ли данные в localStorage
+            const images = localStorage.getItem('cards');
+            if(images) {
+            //Если есть то переводим строку в JS объект и запускаем фун-ию отрисовки   
+            displayResult(JSON.parse(images));
+            }
+
+            // Обработчик на кнопку для запроса
+            btn.addEventListener("click", async () => {
+                // Получение данных из input:
+                const valuePage = document.querySelector('.input__page').value;
+                const valueLimit = document.querySelector('.input__limit').value;
+                //Создаем переменные для проверки условий
+                let pageExam = valuePage >= 1 && valuePage <= 10;
+                let limitExam = valueLimit >= 1 && valueLimit <= 10;
+                //Проверяем условия
+                if (pageExam && limitExam) {
+                    fetch(`https://jsonplaceholder.typicode.com/photos?_page=${valuePage}&_limit=${valueLimit}`)
+                        .then((response) => {
+                            // Объект ответа на запрос
+                            console.log('response', response);
+                            // Превращаем объект в JSON. Мы не можем его сразу прочитать,
+                            // надо отдать в следующий then
+                            return response.json();
+                        })
+                        .then((data) => {
+                        // Объект результата в формате JSON
+                            displayResult(data);
+                            localStorage.setItem('cards', JSON.stringify(data));
+                            }) 
+                        .catch(() => { console.log('error') })
+                        
+                } else if (pageExam && !limitExam) {
+                    resultNode.innerHTML = "Лимит вне диапазона от 1 до 10";
+                } else if (!pageExam && limitExam) {
+                    resultNode.innerHTML = "Номер страницы вне диапазона от 1 до 10";
+                } else {
+                    resultNode.innerHTML = "Номер страницы и лимит вне диапазона от 1 до 10";
+                }
+            });
+            btnClear.addEventListener("click", () => {
+                localStorage.clear();
+                alert('Данные из localStorage удалены');
+            });
+        </script>
+    </body>
+</html>

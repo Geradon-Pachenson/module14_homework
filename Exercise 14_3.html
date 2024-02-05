@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Exersise 3</title>
+    </head>
+    <body>
+        <input type="number" class="input" placeholder="Введите число от 1 до 10" style="color: #E3B873; width: 10%; font-size: 14px; background-color: rgb(0, 0, 0);" />
+        <button class="button" style="border-radius: 2px; background: #E3B873; cursor: pointer;">BUTTON</button>
+        <div class="picture" style="padding: 50px; width: 90%; display: flex; justify-content: center; gap: 30px;"></div>
+        <script>
+            const input = document.querySelector("input");
+            const btn = document.querySelector("button");
+            // Переменная из div class="picture"
+            const resultNode = document.querySelector(".picture");
+
+            function useRequest(url, callback) {
+                // Создаем экзепляр класса XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                    console.log('Статус ответа: ', xhr.status);
+                    } else {
+                    const result = JSON.parse(xhr.response);
+                    if (callback) {
+                        callback(result);
+                    }
+                    }
+                };
+                
+                xhr.onerror = function() {
+                    console.log('Ошибка! Статус ответа: ', xhr.status);
+                };
+                
+                xhr.send();
+            };
+            /**
+             * Функция обработки полученного результата
+             * apiData - объект с результатом запроса
+             */
+            function displayResult(apiData) {
+                let cards = "";
+
+                apiData.forEach((item) => {
+                const cardBlock = `
+                <div class="card">
+                    <img
+                    src="${item.thumbnailUrl}"
+                    class="card-image"
+                    />
+                </div>
+                `;
+                cards += cardBlock;
+                });
+
+                resultNode.innerHTML = cards;
+            }
+            // Вешаем обработчик на кнопку для запроса
+            btn.addEventListener("click", function () {
+                // Получение данных из input:
+                const value = document.querySelector('input').value;
+                // const value = Number(input.value);
+                const url = "https://jsonplaceholder.typicode.com/photos?_limit=" + value;
+
+                if (value < 1 || value > 10) {
+                alert("число вне диапазона от 1 до 10");
+                } else {
+                useRequest(url, displayResult);
+                }
+            });
+        </script>
+    </body>
+</html>

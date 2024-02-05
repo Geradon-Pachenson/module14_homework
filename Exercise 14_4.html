@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Exersise 4</title>
+    </head>
+    <body>
+        <input type="text" class="input__widht" placeholder="Введите число от 100 до 300" style="color: #E3B873; width: 10%; font-size: 14px; background-color: rgb(95, 93, 93); " />
+        <input type="text" class="input__height" placeholder="Введите число от 100 до 300" style="color: #E3B873; width: 10%; font-size: 14px; background-color: rgb(94, 4, 4);" />
+        <button class="button" style="border-radius: 2px; background: #E3B873; cursor: pointer;">submit</button>
+        <div class="picture" style="padding: 50px; width: 90%; display: flex;"></div>
+        <script>
+            const btn = document.querySelector("button");
+            // Переменная из div class="picture"
+            const resultNode = document.querySelector(".picture");
+
+            const useRequest = (valueWidht, valueHeight) => {
+                return fetch(`https://dummyimage.com/${valueWidht}x${valueHeight}`)
+                    .then((response)=>{
+                    displayResult(response.url);
+                    return response;
+                    })
+                    .catch(() => { console.log('error') })
+                
+            };
+            
+            function displayResult(linkSrc) {
+                let cards = '';
+                cards = cards + `<img class="image" src="${linkSrc}" alt="image">`;
+                resultNode.innerHTML=cards;
+            };
+
+            // Обработчик на кнопку для запроса
+            btn.addEventListener("click", async () => {
+                // Получение данных из input:
+                const valueWidht = document.querySelector('.input__widht').value;
+                const valueHeight = document.querySelector('.input__height').value;
+                if (valueWidht < 100 || valueWidht > 300 || valueHeight < 100 || valueHeight > 300 || isNaN(valueWidht) || isNaN(valueHeight)) {
+                    resultNode.innerHTML = "Одно из чисел вне диапазона от 100 до 300";
+                } else {
+                const requestResult = await useRequest(valueWidht, valueHeight);
+                }
+            });
+        </script>
+    </body>
+</html>
